@@ -1,0 +1,94 @@
+ActiveEnumeration
+===========
+
+This plugin allows for the creation of "enum" classes, which can be referenced with an integer attribute column similar to other
+record associations, but they do not need extra tables created to hold their information.  They exist solely in memory.
+
+Example
+=======
+
+To define a custom enum class, extend the Enumeration class, and then call has_enumerated with a 'key' value, and some options:
+
+  class Gender < ActiveEnumeration::Base
+    has_enumerated :male, :name => "Male"
+    has_enumerated :female    # The name here will be inferred as "female"
+  end
+
+Then to use this class as an attribute, first add the column to the DB:
+
+  self.up
+    add_column :users, :gender_id, :integer
+  end
+
+Then add the reference in the record class:
+
+  class User < ActiveRecord::Base
+    ...
+    has_enumeration :gender    # the class_name will be inferred as "Gender" and the foreign_key as "gender_id"
+  end
+  
+This enumeration is now ready to be used:
+
+  >> Gender.all
+  => [#<Gender:0x3414238 @key=:male, @name="Male", @id=12345>, #<Gender:0x3414239 @key=:female, @name="female", @id=54321>]
+  >> Gender.first
+  => #<Gender:0x3414238 @key=:male, @name="Male", @id=12345>
+  >> Gender.last
+  => #<Gender:0x3414239 @key=:female, @name="female", @id=54321>
+  >> Gender.find(:all, :order => "name ASC")
+  => [#<Gender:0x3414239 @key=:female, @name="female", @id=54321>, #<Gender:0x3414238 @key=:male, @name="Male", @id=12345>]
+  
+  >> User.reflect_on_all_enumerations
+  => [#<EnumerationReflection:0x3517964 @class_name="Gender", @foreign_key="gender_id", @name="gender">]
+  >> User.reflect_on_enumeration(:gender)
+  => #<EnumerationReflection:0x3517964 @class_name="Gender", @foreign_key="gender_id", @name="gender">
+  
+  >> User.first.gender
+  => #<Gender:0x3414238 @key=:male, @name="Male", @id=12345>
+  
+  >> User.first.update_attribute(:gender, Gender[:female])
+  >> User.first.gender
+  => #<Gender:0x3414239 @key=:female, @name="female", @id=54321>
+  
+You can set a different class_name or foreign_key for the enumeration as follows:
+
+  class User < ActiveRecord::Base
+    ...
+    has_enumeration :sex, :class_name => "Gender", :foreign_key => :gender_id
+  end
+
+You can also set custom attributes of the enumeration class as follows:
+
+  class ContentType < ActiveEnumeration::Base
+    has_enumerated :swf, :name => "Adobe Flash Movie", :mime => 'application/x-shockwave-flash', :extension => 'swf'
+    has_enumerated :mov, :name => "Quicktime Movie", :mime => 'video/quicktime', :extension => 'mov'
+    has_enumerated :wmv, :name => "Windows Media Video", :mime => 'video/x-ms-wmv', :extension => 'wmv'
+  end
+  
+  >> ContentType.values.first.mime
+  => "application/x-shockwave-flash"
+  
+  >> ContentType.values.first.extension
+  => "swf"
+
+You can include the enumerations helper in the ApplicationController:
+
+  class ApplicationController < ActionController::Base
+    ...
+    helper EnumerationHelper
+  end
+  
+And then utilize the helper functions in your views.
+The enumeration_name() function (also aliased as 'e') simply outputs the name of the passed enumeration,
+or the default value if nil is passed (if no value has been set).
+
+  <p>Type: <%= e(@user.gender, "Unknown") %></p>
+  
+The enumeration_options_for_select(), enumeration_select(), and enumeration_select_tag() functions work very similarly to their
+standard select counterparts in the FormHelper.  But these take an enumeraction_class parameter which will create the select options
+based on the values of that enumeration.
+
+  <%= enumeration_select(@user, :gender, { :allow_blank => true }) %>
+  
+
+Copyright (c) 2008 Glenn Powell, released under the MIT license
