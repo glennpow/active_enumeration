@@ -44,6 +44,7 @@ module ActiveEnumeration
     end
 
     def self.[](id_or_key)
+      return nil if id_or_key.nil?
       case id_or_key
       when Fixnum
         self.all.detect { |enumerated| enumerated.id == id_or_key }
