@@ -52,5 +52,9 @@ module ActiveEnumeration
         self.all.detect { |enumerated| enumerated.key == id_or_key.to_sym }
       end
     end
+    
+    def method_missing(name, *args)
+      args.empty? ? self[name] : super
+    end
   end
 end

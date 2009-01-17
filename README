@@ -37,6 +37,10 @@ This enumeration is now ready to be used:
   => #<Gender:0x3414239 @key=:female, @name="female", @id=54321>
   >> Gender.find(:all, :order => "name ASC")
   => [#<Gender:0x3414239 @key=:female, @name="female", @id=54321>, #<Gender:0x3414238 @key=:male, @name="Male", @id=12345>]
+  >> Gender[:female]
+  => #<Gender:0x3414239 @key=:female, @name="female", @id=54321>
+  >> Gender.female
+  => #<Gender:0x3414239 @key=:female, @name="female", @id=54321>
   
   >> User.reflect_on_all_enumerations
   => [#<EnumerationReflection:0x3517964 @class_name="Gender", @foreign_key="gender_id", @name="gender">]
