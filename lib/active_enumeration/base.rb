@@ -40,7 +40,13 @@ module ActiveEnumeration
     end
 
     def self.has_enumerated(key, options = {})
-      self.all << self.new(key, options)
+      enumerated = self.new(key, options)
+      self.all << enumerated
+      (class << self; self; end).instance_eval do
+        define_method "#{key}" do
+          enumerated
+        end
+      end
     end
 
     def self.[](id_or_key)
@@ -51,10 +57,6 @@ module ActiveEnumeration
       else
         self.all.detect { |enumerated| enumerated.key == id_or_key.to_sym }
       end
-    end
-    
-    def method_missing(name, *args)
-      args.empty? ? self[name] : super
     end
   end
 end
