@@ -1,18 +1,23 @@
 module ActiveEnumeration
   class Base
-    attr_reader :id, :key, :name
+    attr_reader :id, :key, :translate_key
 
     def initialize(*args)
       options = args.extract_options!
       @key = args.first.to_sym
       @id = @key.to_s.hash
       @name = options.delete(:name) || key.to_s
+      @translate_key = options.delete(:translate_key)
       options.each do |key, value|
         self.instance_variable_set("@#{key}", value)
         self.class_eval do
           attr_reader key.to_sym
         end
       end
+    end
+    
+    def name
+      @translate_key ? I18n.t(@translate_key, @name) : @name
     end
 
     def self.all(options = {})
