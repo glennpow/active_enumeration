@@ -17,7 +17,7 @@ module ActiveEnumeration
     end
     
     def name
-      @translate_key ? I18n.t(@translate_key, @name) : @name
+      @translate_key ? I18n.t(@translate_key, :default => @name) : @name
     end
 
     def self.all(options = {})
