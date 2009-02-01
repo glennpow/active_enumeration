@@ -60,7 +60,7 @@ module ActiveEnumeration
       when Fixnum
         self.all.detect { |enumerated| enumerated.id == id_or_key }
       else
-        self.all.detect { |enumerated| enumerated.key == id_or_key.to_sym }
+        self.all.detect { |enumerated| enumerated.id == id_or_key.to_i || enumerated.key == id_or_key.to_sym }
       end
     end
   end
