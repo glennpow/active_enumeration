@@ -9,21 +9,29 @@ module EnumerationHelper
   end
   
   def enumeration_select(form_or_record, name, options = {}, html_options = {})
-    case form_or_record
-    when ActionView::Helpers::FormBuilder
+    enumeration_foreign_key = options.delete(:enumeration_foreign_key)
+    enumeration_class = options.delete(:enumeration_class)
+    
+    if (enumeration_foreign_key.nil? || enumeration_class.nil?) && form_or_record.object
       record_class = form_or_record.object.class
       if record_class.respond_to?(:reflect_on_enumeration) && reflection = record_class.reflect_on_enumeration(name)
-        form_or_record.select(reflection.foreign_key, enumeration_options_for_select(reflection.klass, options), options, html_options)
+        enumeration_foreign_key ||= reflection.foreign_key
+        enumeration_class ||= reflection.klass
       end
+    end
+    
+    enumeration_foreign_key ||= :"#{name}_id"
+    enumeration_class ||= name.to_s.classify.constantize
+    
+    case form_or_record
+    when ActionView::Helpers::FormBuilder
+      form_or_record.select(enumeration_foreign_key, enumeration_options_for_select(enumeration_class, options), options, html_options)
     else
-      record_class = form_or_record.class
-      if record_class.respond_to?(:reflect_on_enumeration) && reflection = record_class.reflect_on_enumeration(name)
-        select(form_or_record, reflection.foreign_key, enumeration_options_for_select(reflection.klass, options), options, html_options)
-      end
+      select(form_or_record, enumeration_foreign_key, enumeration_options_for_select(enumeration_class, options), options, html_options)
     end
   end
   
   def enumeration_select_tag(name, enumeration_class, options = {})
-    select_tag(name, enumeration_options_for_select(enumeration_class, options), options)
+    select_tag(name, options_for_select(enumeration_options_for_select(enumeration_class, options)), options)
   end
 end
