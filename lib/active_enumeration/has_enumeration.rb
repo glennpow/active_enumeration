@@ -15,7 +15,11 @@ module ActiveEnumeration
 
         class_eval do
           define_method name do
-            reflection.klass[super]
+            if reflection.foreign_key.to_s == name.to_s
+              reflection.klass[super]
+            else
+              reflection.klass[self.send("#{reflection.foreign_key}")]
+            end
           end
         
           define_method "#{name}=" do |value|
