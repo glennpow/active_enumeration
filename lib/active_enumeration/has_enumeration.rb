@@ -20,7 +20,7 @@ module ActiveEnumeration
         
           define_method "#{name}=" do |value|
             enumerate = case value
-            when Enumeration
+            when ActiveEnumeration::Base
               value
             else
               reflection.klass[value]
