@@ -15,7 +15,7 @@ module ActiveEnumeration
 
         class_eval do
           define_method name do
-            reflection.klass[self.send(reflection.foreign_key)]
+            reflection.klass[super]
           end
         
           define_method "#{name}=" do |value|
@@ -25,7 +25,7 @@ module ActiveEnumeration
             else
               reflection.klass[value]
             end
-            self.send("#{reflection.foreign_key}=", enumerate.id)
+            self.send("#{reflection.foreign_key}=", enumerate.key)
           end
         end
       end

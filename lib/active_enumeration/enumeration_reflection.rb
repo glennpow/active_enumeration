@@ -5,7 +5,7 @@ module ActiveEnumeration
     def initialize(name, options = {})
       @name = name.to_s
       @class_name = (options[:class_name] || name).to_s.camelize
-      @foreign_key = (options[:foreign_key] || "#{name}_id").to_s
+      @foreign_key = (options[:foreign_key] || name).to_s
     end
   
     def ==(other_aggregation)

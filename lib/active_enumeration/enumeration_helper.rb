@@ -5,7 +5,7 @@ module EnumerationHelper
   alias_method :e, :enumeration_name
 
   def enumeration_options_for_select(enumeration_class, options = {})
-    enumeration_class.find(:all, options.reverse_merge(:order => 'name asc')).map { |enumeration| [ enumeration.name, enumeration.id ] }
+    enumeration_class.find(:all, options.reverse_merge(:order => 'name asc')).map { |enumeration| [ enumeration.name, enumeration.key ] }
   end
   
   def enumeration_select(form_or_record, name, options = {}, html_options = {})

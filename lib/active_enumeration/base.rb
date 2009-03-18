@@ -1,11 +1,10 @@
 module ActiveEnumeration
   class Base
-    attr_reader :id, :key, :translate_key
+    attr_reader :key, :translate_key
 
     def initialize(*args)
       options = args.extract_options!
       @key = args.first.to_sym
-      @id = @key.to_s.hash
       @name = options.delete(:name) || key.to_s
       @translate_key = options.delete(:translate_key)
       options.each do |key, value|
@@ -18,6 +17,21 @@ module ActiveEnumeration
     
     def name
       @translate_key ? I18n.t(@translate_key, :default => @name) : @name
+    end
+    
+    def to_yaml(options = {})
+      key.to_s
+    end
+    
+    def ==(value)
+      case value
+      when String, Symbol
+        self.key == value.to_sym
+      when ActiveEnumeration::Base
+        self.key == value.key
+      else
+        false
+      end
     end
 
     def self.all(options = {})
@@ -54,14 +68,9 @@ module ActiveEnumeration
       end
     end
 
-    def self.[](id_or_key)
-      return nil if id_or_key.nil?
-      case id_or_key
-      when Fixnum
-        self.all.detect { |enumerated| enumerated.id == id_or_key }
-      else
-        self.all.detect { |enumerated| enumerated.id == id_or_key.to_i || enumerated.key == id_or_key.to_sym }
-      end
+    def self.[](key)
+      return nil if key.nil?
+      self.all.detect { |enumerated| enumerated.key == key.to_sym }
     end
   end
 end
