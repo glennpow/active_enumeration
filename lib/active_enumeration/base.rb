@@ -19,6 +19,10 @@ module ActiveEnumeration
       @translate_key ? I18n.t(@translate_key, :default => @name) : @name
     end
     
+    def to_s
+      key.to_s
+    end
+    
     def to_yaml(options = {})
       key.to_s
     end
