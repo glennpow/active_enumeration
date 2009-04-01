@@ -29,10 +29,11 @@ module ActiveEnumeration
             else
               reflection.klass[value]
             end
+            enumerate_value = enumerate.nil? ? nil : enumerate.to_s
             if reflection.foreign_key.to_s == name.to_s
-              super(enumerate.key)
+              super(enumerate_value)
             else
-              self.send("#{reflection.foreign_key}=", enumerate.key)
+              self.send("#{reflection.foreign_key}=", enumerate_value)
             end
           end
         end

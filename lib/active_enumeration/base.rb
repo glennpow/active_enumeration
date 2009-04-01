@@ -23,6 +23,10 @@ module ActiveEnumeration
       key.to_s
     end
     
+    def to_sym
+      key
+    end
+    
     def to_yaml(options = {})
       key.to_s
     end
@@ -73,7 +77,7 @@ module ActiveEnumeration
     end
 
     def self.[](key)
-      return nil if key.nil?
+      return nil if key.blank?
       self.all.detect { |enumerated| enumerated.key == key.to_sym }
     end
   end

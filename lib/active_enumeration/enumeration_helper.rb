@@ -5,7 +5,7 @@ module EnumerationHelper
   alias_method :e, :enumeration_name
 
   def enumeration_options_for_select(enumeration_class, options = {})
-    enumeration_class.find(:all, options.reverse_merge(:order => 'name asc')).map { |enumeration| [ enumeration.name, enumeration.key ] }
+    enumeration_class.find(:all, options.reverse_merge(:order => 'name asc')).map { |enumeration| [ enumeration.name, enumeration ] }
   end
   
   def enumeration_select(form_or_record, name, options = {}, html_options = {})
@@ -20,7 +20,7 @@ module EnumerationHelper
       end
     end
     
-    enumeration_foreign_key ||= :"#{name}_id"
+    enumeration_foreign_key ||= name.to_sym
     enumeration_class ||= name.to_s.classify.constantize
     
     case form_or_record
