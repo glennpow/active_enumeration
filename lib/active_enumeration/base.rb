@@ -1,6 +1,8 @@
 module ActiveEnumeration
   class Base
     attr_reader :key, :translate_key
+    
+    @@editable = false
 
     def initialize(*args)
       options = args.extract_options!
@@ -75,10 +77,22 @@ module ActiveEnumeration
         end
       end
     end
+    
+    def self.make_editable
+      @@editable = true
+    end
+    
+    def self.editable?
+      @@editable
+    end
 
     def self.[](key)
       return nil if key.blank?
-      self.all.detect { |enumerated| enumerated.key == key.to_sym }
+      value = self.all.detect { |enumerated| enumerated.key == key.to_sym }
+      if value.nil? && self.editable?
+        value = self.new(key)
+      end
+      value
     end
   end
 end
