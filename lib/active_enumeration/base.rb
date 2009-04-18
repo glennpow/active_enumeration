@@ -17,6 +17,10 @@ module ActiveEnumeration
       end
     end
     
+    def id
+      key.to_s.hash
+    end
+    
     def name
       @translate_key ? I18n.t(@translate_key, :default => @name) : @name
     end
@@ -55,8 +59,8 @@ module ActiveEnumeration
       values
     end
 
-    def self.find(key, options = {})
-      case key
+    def self.find(id_or_key, options = {})
+      case id_or_key
       when :all
         self.all(options)
       when :first
@@ -64,7 +68,7 @@ module ActiveEnumeration
       when :last
         self.all(options).last
       else
-        self[key]
+        self[id_or_key]
       end
     end
 
@@ -86,11 +90,11 @@ module ActiveEnumeration
       @@editable
     end
 
-    def self.[](key)
-      return nil if key.blank?
-      value = self.all.detect { |enumerated| enumerated.key == key.to_sym }
+    def self.[](id_or_key)
+      return nil if id_or_key.blank?
+      value = self.all.detect { |enumerated| enumerated.id == id_or_key || enumerated.key == id_or_key.to_sym }
       if value.nil? && self.editable?
-        value = self.new(key)
+        value = self.new(id_or_key)
       end
       value
     end
