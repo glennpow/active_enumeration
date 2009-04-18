@@ -45,28 +45,36 @@ module ActiveEnumeration
       end
     end
 
-    def self.all(options = {})
-      values = read_inheritable_attribute(:values)
-      write_inheritable_attribute(:values, values = []) if values.nil?
-      if options[:order]
-        order_by, order_in = options[:order].scan(/\w+/).map(&:downcase)
-        order_asc = (order_in || 'asc') == 'asc'
-        values.sort! { |a, b| (order_asc ? a : b).send(order_by) <=> (order_asc ? b : a).send(order_by) }
-      end
-      values
-    end
-
     def self.find(id_or_key, options = {})
       case id_or_key
       when :all
-        self.all(options)
+        values = read_inheritable_attribute(:values)
+        write_inheritable_attribute(:values, values = []) if values.nil?
+        if options[:order]
+          order_by, order_in = options[:order].scan(/\w+/).map(&:downcase)
+          order_asc = (order_in || 'asc') == 'asc'
+          values.sort! { |a, b| (order_asc ? a : b).send(order_by) <=> (order_asc ? b : a).send(order_by) }
+        end
+        values
       when :first
-        self.all(options).first
+        self.find(:all, options).first
       when :last
-        self.all(options).last
+        self.find(:all, options).last
       else
         self[id_or_key]
       end
+    end
+    
+    def self.all(options = {})
+      self.find(:all, options)
+    end
+
+    def self.first(options = {})
+      self.find(:first, options)
+    end
+    
+    def self.last(options = {})
+      self.find(:last, options)
     end
 
     def self.has_enumerated(key, options = {})
@@ -89,7 +97,7 @@ module ActiveEnumeration
 
     def self.[](id_or_key)
       return nil if id_or_key.blank?
-      value = self.all.detect { |enumerated| enumerated.id == id_or_key || enumerated.key == id_or_key.to_sym }
+      value = self.all.detect { |enumerated| enumerated.id == id_or_key.to_i || enumerated.key == id_or_key.to_sym }
       if value.nil? && self.editable?
         value = self.new(id_or_key)
       end
