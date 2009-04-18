@@ -1,12 +1,13 @@
 module ActiveEnumeration
   class Base
-    attr_reader :key, :translate_key
+    attr_reader :id, :key, :translate_key
     
     @@editable = false
 
     def initialize(*args)
       options = args.extract_options!
       @key = args.first.to_sym
+      @id = @key.to_s.hash.abs
       @name = options.delete(:name) || key.to_s
       @translate_key = options.delete(:translate_key)
       options.each do |key, value|
@@ -15,10 +16,6 @@ module ActiveEnumeration
           attr_reader key.to_sym
         end
       end
-    end
-    
-    def id
-      key.to_s.hash
     end
     
     def name
