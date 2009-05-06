@@ -1,8 +1,8 @@
 ActiveEnumeration
 ===========
 
-This plugin allows for the creation of "enum" classes, which can be referenced with an integer attribute column similar to other
-record associations, but they do not need extra tables created to hold their information.  They exist solely in memory.
+This plugin allows for the creation of "enum" classes, which can be referenced by a String value.
+They act similar to ActiveRecords, but they do not require a new database table associated with them.
 
 Example
 =======
@@ -59,6 +59,14 @@ You can set a different class_name or foreign_key for the enumeration as follows
   class User < ActiveRecord::Base
     ...
     has_enumeration :sex, :class_name => "Gender", :foreign_key => :gender_id
+  end
+  
+You can use I18n transations for the human-readable name as follows:
+
+  class Gender < ActiveEnumeration::Base
+    has_enumerated :male, :translation_key => "genders.male"
+    has_enumerated :female, :translation_key => "genders.female"
+    has_enumerated :other, :translation_key => "genders.other"
   end
 
 You can also set custom attributes of the enumeration class as follows:

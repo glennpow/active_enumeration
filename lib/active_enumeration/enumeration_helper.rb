@@ -35,3 +35,5 @@ module EnumerationHelper
     select_tag(name, options_for_select(enumeration_options_for_select(enumeration_class, options)), options)
   end
 end
+
+ActionView::Base.send :include, EnumerationHelper if defined?(ActionView::Base)
