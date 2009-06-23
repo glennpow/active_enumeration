@@ -12,8 +12,15 @@ module EnumerationHelper
     enumeration_foreign_key = options.delete(:enumeration_foreign_key)
     enumeration_class = options.delete(:enumeration_class)
     
-    if (enumeration_foreign_key.nil? || enumeration_class.nil?) && form_or_record.object
-      record_class = form_or_record.object.class
+    record = case form_or_record
+    when ActionView::Helpers::FormBuilder
+      form_or_record.object
+    else
+      form_or_record
+    end
+    
+    if (enumeration_foreign_key.nil? || enumeration_class.nil?) && record
+      record_class = record.class
       if record_class.respond_to?(:reflect_on_enumeration) && reflection = record_class.reflect_on_enumeration(name)
         enumeration_foreign_key ||= reflection.foreign_key
         enumeration_class ||= reflection.klass
